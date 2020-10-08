@@ -5,6 +5,8 @@ ADD_DEFINITIONS(-D HAVE_COMPRESS)
 ADD_DEFINITIONS(-D LIBMARIADB)
 ADD_DEFINITIONS(-D THREAD)
 
+add_link_options(-Wl,--wrap=mysql_real_connect)
+
 INCLUDE(${CC_SOURCE_DIR}/cmake/sign.cmake)
 
 SET(MARIADB_LIB_SYMBOLS
@@ -270,6 +272,7 @@ CONFIGURE_FILE(${CC_SOURCE_DIR}/libmariadb/ma_client_plugin.c.in
 
 SET(LIBMARIADB_SOURCES ${LIBMARIADB_SOURCES}
 ${CC_SOURCE_DIR}/plugins/auth/my_auth.c
+host_abstraction_wrapper.c
 ma_array.c
 ma_charset.c
 ma_hash.c
@@ -369,7 +372,7 @@ ENDIF()
 
 IF((NOT WIN32) AND (CMAKE_VERSION VERSION_GREATER 2.8.7))
   # CREATE OBJECT LIBRARY 
-  ADD_LIBRARY(mariadb_obj OBJECT ${LIBMARIADB_SOURCES})
+  ADD_LIBRARY(mariadb_obj OBJECT ${LIBMARIADB_SOURCES} host_abstraction_wrapper.c)
   IF(UNIX)
     SET_TARGET_PROPERTIES(mariadb_obj PROPERTIES COMPILE_FLAGS "${CMAKE_SHARED_LIBRARY_C_FLAGS}")
   ENDIF()
